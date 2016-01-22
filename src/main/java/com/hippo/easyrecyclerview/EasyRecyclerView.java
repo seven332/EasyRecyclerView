@@ -703,7 +703,7 @@ public class EasyRecyclerView extends RecyclerView {
 
     /**
      * Set a {@link MultiChoiceModeListener} that will manage the lifecycle of the
-     * selection {@link android.support.v7.view.ActionMode}. Only used when the choice mode is set to
+     * selection {@link android.view.ActionMode}. Only used when the choice mode is set to
      * {@link #CHOICE_MODE_MULTIPLE_MODAL}.
      *
      * @param listener Listener that will manage the selection mode
@@ -1396,7 +1396,7 @@ public class EasyRecyclerView extends RecyclerView {
 
     /**
      * A MultiChoiceModeListener receives events for {@link android.widget.AbsListView#CHOICE_MODE_MULTIPLE_MODAL}.
-     * It acts as the {@link android.support.v7.view.ActionMode.Callback} for the selection mode and also receives
+     * It acts as the {@link android.view.ActionMode.Callback} for the selection mode and also receives
      * {@link #onItemCheckedStateChanged(android.view.ActionMode, int, long, boolean)} events when the user
      * selects and deselects list items.
      */
@@ -1404,7 +1404,7 @@ public class EasyRecyclerView extends RecyclerView {
         /**
          * Called when an item is checked or unchecked during selection mode.
          *
-         * @param mode The {@link android.support.v7.view.ActionMode} providing the selection mode
+         * @param mode The {@link android.view.ActionMode} providing the selection mode
          * @param position Adapter position of the item that was checked or unchecked
          * @param id Adapter ID of the item that was checked or unchecked
          * @param checked <code>true</code> if the item is now checked, <code>false</code>
