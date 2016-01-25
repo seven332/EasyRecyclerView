@@ -42,7 +42,7 @@ public class FastScroller extends View {
     private static final int SCROLL_BAR_FADE_DURATION = 500;
     private static final int SCROLL_BAR_DELAY = 1000;
 
-    private static final int MIN_HANDLER_HEIGHT_DP = 24;
+    private static final int MIN_HANDLER_HEIGHT_DP = 32;
 
     private Handler mSimpleHandler;
 
@@ -69,6 +69,8 @@ public class FastScroller extends View {
     private boolean mCantDrag = false;
 
     private int mTouchSlop;
+
+    private OnDragHandlerListener mListener;
 
     private ObjectAnimator mShowAnimator;
     private ObjectAnimator mHideAnimator;
@@ -134,6 +136,10 @@ public class FastScroller extends View {
                 }
             }
         });
+    }
+
+    public void setOnDragHandlerListener(OnDragHandlerListener listener) {
+        mListener = listener;
     }
 
     private void updatePosition(boolean show) {
@@ -353,6 +359,10 @@ public class FastScroller extends View {
                         } else {
                             mLastMotionY = mDownY;
                         }
+                        // Notify
+                        if (mListener != null) {
+                            mListener.onStartDragHandler();
+                        }
                     }
                 }
 
@@ -368,11 +378,20 @@ public class FastScroller extends View {
             }
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
+                // Notify
+                if (mDragged && mListener != null) {
+                    mListener.onEndDragHandler();
+                }
                 mDragged = false;
                 mSimpleHandler.postDelayed(mHideRunnable, SCROLL_BAR_DELAY);
                 break;
         }
 
         return true;
+    }
+
+    public interface OnDragHandlerListener {
+        void onStartDragHandler();
+        void onEndDragHandler();
     }
 }
