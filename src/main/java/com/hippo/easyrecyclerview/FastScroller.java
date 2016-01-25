@@ -27,10 +27,12 @@ import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 
-import com.hippo.anani.SimpleAnimatorListener;
 import com.hippo.anani.AnimationUtils;
+import com.hippo.anani.SimpleAnimatorListener;
 import com.hippo.yorozuya.LayoutUtils;
+import com.hippo.yorozuya.MathUtils;
 import com.hippo.yorozuya.SimpleHandler;
 
 public class FastScroller extends View {
@@ -65,6 +67,8 @@ public class FastScroller extends View {
     private boolean mDragged = false;
 
     private boolean mCantDrag = false;
+
+    private int mTouchSlop;
 
     private ObjectAnimator mShowAnimator;
     private ObjectAnimator mHideAnimator;
@@ -103,6 +107,7 @@ public class FastScroller extends View {
         setVisibility(INVISIBLE);
 
         mMinHandlerHeight = LayoutUtils.dp2pix(context, MIN_HANDLER_HEIGHT_DP);
+        mTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
 
         mShowAnimator = ObjectAnimator.ofFloat(this, "alpha", 1.0f);
         mShowAnimator.setInterpolator(AnimationUtils.FAST_SLOW_INTERPOLATOR);
@@ -330,7 +335,12 @@ public class FastScroller extends View {
                 if (!mDragged) {
                     float x = event.getX();
                     float y = event.getY();
-                    if (Math.abs(x - mDownX) > Math.abs(y - mDownY) || y < mHandlerOffset || y > mHandlerOffset + mHandlerHeight) {
+                    // Check touch slop
+                    if (MathUtils.dist(x, y, mDownX, mDownY) < mTouchSlop) {
+                        return true;
+                    }
+                    if (Math.abs(x - mDownX) > Math.abs(y - mDownY) ||
+                            y < mHandlerOffset || y > mHandlerOffset + mHandlerHeight) {
                         mCantDrag = true;
                         return false;
                     } else {
