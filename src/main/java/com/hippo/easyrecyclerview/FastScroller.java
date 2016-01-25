@@ -158,7 +158,7 @@ public class FastScroller extends View {
         endHeight = Math.max(endHeight, mMinHandlerHeight);
         endOffest = Math.min(endOffest, height- endHeight);
 
-        mHandlerOffset = endOffest;
+        mHandlerOffset = endOffest + paddingTop;
         mHandlerHeight = endHeight;
 
         if (show) {
@@ -299,7 +299,7 @@ public class FastScroller extends View {
 
         int paddingLeft = getPaddingLeft();
         int saved = canvas.save();
-        canvas.translate(paddingLeft, getPaddingTop() + mHandlerOffset);
+        canvas.translate(paddingLeft, mHandlerOffset);
         mHandler.setBounds(0, 0, getWidth() - paddingLeft - getPaddingRight(), mHandlerHeight);
         mHandler.draw(canvas);
         canvas.restoreToCount(saved);
