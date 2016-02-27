@@ -106,6 +106,9 @@ public class EasyRecyclerView extends RecyclerView {
 
     private boolean mCustomChoice = false;
 
+    /**
+     * A lock, avoid OutOfCustomChoiceMode when doing OutOfCustomChoiceMode
+     */
     private boolean mOutOfCustomChoiceModing = false;
 
     private SparseBooleanArray mTempCheckStates;
@@ -521,7 +524,7 @@ public class EasyRecyclerView extends RecyclerView {
         return ids;
     }
 
-    public boolean inCustomChoice() {
+    public boolean isInCustomChoice() {
         return mCustomChoice;
     }
 
@@ -559,7 +562,7 @@ public class EasyRecyclerView extends RecyclerView {
     /**
      * Clear any choices previously set
      */
-    public void clearChoices() {
+    private void clearChoices() {
         if (mCheckStates != null) {
             mCheckStates.clear();
         }
@@ -567,6 +570,52 @@ public class EasyRecyclerView extends RecyclerView {
             mCheckedIdStates.clear();
         }
         mCheckedItemCount = 0;
+        updateOnScreenCheckedViews();
+    }
+
+    /**
+     * Sets all items checked.
+     */
+    public void checkAll() {
+        if (mChoiceMode == CHOICE_MODE_NONE || mChoiceMode == CHOICE_MODE_SINGLE) {
+            return;
+        }
+
+        // Check is intoCheckMode
+        if (mChoiceMode == CHOICE_MODE_MULTIPLE_CUSTOM && !mCustomChoice) {
+            throw new IllegalStateException("Call intoCheckMode first");
+        }
+
+        // Start selection mode if needed. We don't need to if we're unchecking something.
+        if (mChoiceMode == CHOICE_MODE_MULTIPLE_MODAL && mChoiceActionMode == null) {
+            if (mMultiChoiceModeCallback == null ||
+                    !mMultiChoiceModeCallback.hasWrappedCallback()) {
+                throw new IllegalStateException("EasyRecyclerView: attempted to start selection mode " +
+                        "for CHOICE_MODE_MULTIPLE_MODAL but no choice mode callback was " +
+                        "supplied. Call setMultiChoiceModeListener to set a callback.");
+            }
+            mChoiceActionMode = startActionMode(mMultiChoiceModeCallback);
+        }
+
+        for (int i = 0, n = mAdapter.getItemCount(); i < n; i++) {
+            boolean oldValue = mCheckStates.get(i);
+            mCheckStates.put(i, true);
+            if (mCheckedIdStates != null && mAdapter.hasStableIds()) {
+                mCheckedIdStates.put(mAdapter.getItemId(i), i);
+            }
+            if (!oldValue) {
+                mCheckedItemCount++;
+            }
+            if (mChoiceActionMode != null) {
+                final long id = mAdapter.getItemId(i);
+                mMultiChoiceModeCallback.onItemCheckedStateChanged(mChoiceActionMode, i, id, true);
+            }
+            if (mChoiceMode == CHOICE_MODE_MULTIPLE_CUSTOM) {
+                final long id = mAdapter.getItemId(i);
+                mCustomChoiceListener.onItemCheckedStateChanged(this, i, id, true);
+            }
+        }
+
         updateOnScreenCheckedViews();
     }
 
