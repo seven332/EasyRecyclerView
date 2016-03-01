@@ -36,7 +36,6 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile project(':anani')
     compile project(':hotspot')
     compile project(':yorozuya')
     testCompile 'junit:junit:4.12'
