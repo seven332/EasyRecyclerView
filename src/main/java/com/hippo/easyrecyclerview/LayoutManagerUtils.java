@@ -110,8 +110,8 @@ public final class LayoutManagerUtils {
         SimpleHandler.getInstance().postDelayed(new Runnable() {
             @Override
             public void run() {
-                int first = getFirstVisibleItemPostion(layoutManager);
-                int last = getLastVisibleItemPostion(layoutManager);
+                int first = getFirstVisibleItemPosition(layoutManager);
+                int last = getLastVisibleItemPosition(layoutManager);
                 int offset = Math.abs(position - first);
                 int max = last - first;
                 if (offset < max && max > 0) {
@@ -120,38 +120,38 @@ public final class LayoutManagerUtils {
                 } else {
                     scrollToPositionWithOffset(layoutManager, position, 0);
                     if (listener != null) {
-                        listener.onScrollToPosition();
+                        listener.onScrollToPosition(position);
                     }
                 }
             }
         }, 200);
     }
 
-    public static int getFirstVisibleItemPostion(RecyclerView.LayoutManager layoutManager) {
+    public static int getFirstVisibleItemPosition(RecyclerView.LayoutManager layoutManager) {
         if (layoutManager instanceof LinearLayoutManager) {
             return ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
         } else if (layoutManager instanceof StaggeredGridLayoutManager) {
             int[] positions = ((StaggeredGridLayoutManager) layoutManager).findFirstVisibleItemPositions(null);
             return MathUtils.min(positions);
         } else {
-            throw new IllegalStateException("Can't do getFirstVisibleItemPostion for " +
+            throw new IllegalStateException("Can't do getFirstVisibleItemPosition for " +
                     layoutManager.getClass().getName());
         }
     }
 
-    public static int getLastVisibleItemPostion(RecyclerView.LayoutManager layoutManager) {
+    public static int getLastVisibleItemPosition(RecyclerView.LayoutManager layoutManager) {
         if (layoutManager instanceof LinearLayoutManager) {
             return ((LinearLayoutManager) layoutManager).findLastVisibleItemPosition();
         } else if (layoutManager instanceof StaggeredGridLayoutManager) {
             int[] positions = ((StaggeredGridLayoutManager) layoutManager).findLastVisibleItemPositions(null);
             return MathUtils.max(positions);
         } else {
-            throw new IllegalStateException("Can't do getFirstVisibleItemPostion for " +
+            throw new IllegalStateException("Can't do getLastVisibleItemPosition for " +
                     layoutManager.getClass().getName());
         }
     }
 
     public interface OnScrollToPositionListener {
-        void onScrollToPosition();
+        void onScrollToPosition(int position);
     }
 }
