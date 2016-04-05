@@ -43,6 +43,7 @@ import android.widget.Checkable;
 
 import com.hippo.hotspot.Hotspot;
 import com.hippo.yorozuya.MathUtils;
+import com.hippo.yorozuya.NumberUtils;
 import com.hippo.yorozuya.ViewUtils;
 
 /**
@@ -1138,6 +1139,7 @@ public class EasyRecyclerView extends RecyclerView {
         };
 
         int choiceMode;
+        boolean customChoice;
         int checkedItemCount;
         SparseBooleanArray checkState;
         LongSparseArray<Integer> checkIdState;
@@ -1166,6 +1168,7 @@ public class EasyRecyclerView extends RecyclerView {
             mSuperState = superState != null ? superState : EMPTY_STATE;
 
             choiceMode = in.readInt();
+            customChoice = NumberUtils.int2boolean(in.readInt());
             checkedItemCount = in.readInt();
             checkState = in.readSparseBooleanArray();
             final int N = in.readInt();
@@ -1189,6 +1192,7 @@ public class EasyRecyclerView extends RecyclerView {
             out.writeParcelable(mSuperState, flags);
 
             out.writeInt(choiceMode);
+            out.writeInt(NumberUtils.boolean2int(customChoice));
             out.writeInt(checkedItemCount);
             out.writeSparseBooleanArray(checkState);
             final int N = checkIdState != null ? checkIdState.size() : 0;
@@ -1222,6 +1226,7 @@ public class EasyRecyclerView extends RecyclerView {
         final SavedState ss = new SavedState(super.onSaveInstanceState());
 
         ss.choiceMode = mChoiceMode;
+        ss.customChoice = mCustomChoice;
         ss.checkedItemCount = mCheckedItemCount;
         ss.checkState = mCheckStates;
         ss.checkIdState = mCheckedIdStates;
@@ -1235,6 +1240,7 @@ public class EasyRecyclerView extends RecyclerView {
         super.onRestoreInstanceState(ss.getSuperState());
 
         setChoiceMode(ss.choiceMode);
+        mCustomChoice = ss.customChoice;
         mCheckedItemCount = ss.checkedItemCount;
         if (ss.checkState != null) {
             mCheckStates = ss.checkState;
