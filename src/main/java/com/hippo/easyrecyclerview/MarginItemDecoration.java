@@ -20,36 +20,43 @@ import android.graphics.Rect;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-
 public class MarginItemDecoration extends RecyclerView.ItemDecoration {
 
-    private int mMarginLeft;
-    private int mMarginTop;
-    private int mMarginRight;
-    private int mMarginBottom;
+    private int mMargin;
+    private int mPaddingLeft;
+    private int mPaddingTop;
+    private int mPaddingRight;
+    private int mPaddingBottom;
 
-    public MarginItemDecoration(int margin) {
-        setMargin(margin);
-    }
-
-    public MarginItemDecoration(int marginLeft, int marginTop, int marginRight, int marginBottom) {
-        setMargin(marginLeft, marginTop, marginRight, marginBottom);
+    public MarginItemDecoration(int margin, int paddingLeft, int paddingTop,
+            int paddingRight, int paddingBottom) {
+        setMargin(margin, paddingLeft, paddingTop, paddingRight, paddingBottom);
     }
 
     @Override
     public void getItemOffsets(Rect outRect, View view,
             RecyclerView parent, RecyclerView.State state) {
-        outRect.set(mMarginLeft, mMarginTop, mMarginRight, mMarginBottom);
+        outRect.set(mMargin, mMargin, mMargin, mMargin);
     }
 
-    public void setMargin(int margin) {
-        mMarginLeft = mMarginTop = mMarginRight = mMarginBottom = margin;
+    /**
+     * @param margin gap between two item
+     * @param paddingLeft gap between RecyclerView left and left item left
+     * @param paddingTop gap between RecyclerView top and top item top
+     * @param paddingRight gap between RecyclerView right and right item right
+     * @param paddingBottom gap between RecyclerView bottom and bottom item bottom
+     */
+    public void setMargin(int margin, int paddingLeft, int paddingTop,
+            int paddingRight, int paddingBottom) {
+        int halfMargin = margin / 2;
+        mMargin = halfMargin;
+        mPaddingLeft = paddingLeft - halfMargin;
+        mPaddingTop = paddingTop - halfMargin;
+        mPaddingRight = paddingRight - halfMargin;
+        mPaddingBottom = paddingBottom - halfMargin;
     }
 
-    public void setMargin(int marginLeft, int marginTop, int marginRight, int marginBottom) {
-        mMarginLeft = marginLeft;
-        mMarginTop = marginTop;
-        mMarginRight = marginRight;
-        mMarginBottom = marginBottom;
+    public void applyPadding(View view) {
+        view.setPadding(mPaddingLeft, mPaddingTop, mPaddingRight, mPaddingBottom);
     }
 }
