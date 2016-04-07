@@ -22,12 +22,4 @@
         <attr name="draggable" format="boolean"/>
     </declare-styleable>
 
-    <declare-styleable name="MonoRecyclerView">
-        <attr name="space" format="dimension"/>
-        <attr name="spaceLeft" format="dimension"/>
-        <attr name="spaceRight" format="dimension"/>
-        <attr name="spaceTop" format="dimension"/>
-        <attr name="spaceBottom" format="dimension"/>
-    </declare-styleable>
-
 </resources>
