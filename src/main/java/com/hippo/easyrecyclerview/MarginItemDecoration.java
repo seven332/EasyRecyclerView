@@ -56,7 +56,7 @@ public class MarginItemDecoration extends RecyclerView.ItemDecoration {
         mPaddingBottom = paddingBottom - halfMargin;
     }
 
-    public void applyPadding(View view) {
+    public void applyPaddings(View view) {
         view.setPadding(mPaddingLeft, mPaddingTop, mPaddingRight, mPaddingBottom);
     }
 }
