@@ -10,8 +10,8 @@ android {
     defaultConfig {
         minSdkVersion 11
         targetSdkVersion 24
-        versionCode 1
-        versionName "0.1.0"
+        versionCode 2
+        versionName "0.1.1"
     }
 
     buildTypes {
@@ -26,7 +26,7 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:recyclerview-v7:24.1.1'
     compile 'com.github.seven332:hotspot:0.1.0'
-    compile 'com.github.seven332:yorozuya:0.1.0'
+    compile 'com.github.seven332:yorozuya:0.1.2'
     testCompile 'junit:junit:4.12'
 }
 
