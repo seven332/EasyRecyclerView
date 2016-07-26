@@ -21,7 +21,7 @@ import android.support.v7.widget.LinearSmoothScroller;
 
 public abstract class SimpleSmoothScroller extends LinearSmoothScroller {
 
-    private float mMillisecondsPerPx;
+    private final float mMillisecondsPerPx;
 
     public SimpleSmoothScroller(Context context, float millisecondsPerInch) {
         super(context);

@@ -133,8 +133,6 @@ public class EasyRecyclerView extends RecyclerView {
 
     private Adapter mAdapter;
 
-    private float mVerticalScrollFactor = 0;
-
     // For click and long click
     private boolean mPrePressed = false;
     private boolean mHasPerformedLongPress = false;
@@ -166,7 +164,7 @@ public class EasyRecyclerView extends RecyclerView {
     /**
      * Defines the selector's location and dimension at drawing time
      */
-    private Rect mSelectorRect = new Rect();
+    private final Rect mSelectorRect = new Rect();
     /**
      * The selection's left padding
      */
@@ -245,7 +243,7 @@ public class EasyRecyclerView extends RecyclerView {
         }
 
         final Rect selectorRect = mSelectorRect;
-        selectorRect.set(sel.getLeft(), sel.getTop(), sel.getRight(), sel.getBottom());
+        selectorRect.set(0, 0, sel.getWidth(), sel.getHeight());
 
         // Adjust for selection padding.
         selectorRect.left -= mSelectionLeftPadding;
@@ -270,9 +268,13 @@ public class EasyRecyclerView extends RecyclerView {
                 updateSelectorState();
             }
             if (manageHotspot) {
-                Hotspot.setHotspot(selector, x, y);
+                setSelectorHotspot(sel, x, y);
             }
         }
+    }
+
+    private void setSelectorHotspot(View sel, float x, float y) {
+        Hotspot.setHotspot(mSelector, x - sel.getLeft(), y - sel.getTop());
     }
 
     @Override
@@ -289,20 +291,25 @@ public class EasyRecyclerView extends RecyclerView {
         }
 
         // TODO disable selector drawable state change when need not to draw selector
-        boolean drawSelector = mOnDrawSelectorListener == null ||
-                mSelectorPosition < 0 ||
-                mSelectorPosition >= mAdapter.getItemCount() ||
-                mOnDrawSelectorListener.beforeDrawSelector(mSelectorPosition);
+        boolean drawSelector = mMotionView != null &&
+                mSelectorPosition >= 0 && mSelectorPosition < mAdapter.getItemCount() &&
+                (mOnDrawSelectorListener == null || mOnDrawSelectorListener.beforeDrawSelector(mSelectorPosition));
         final boolean drawSelectorOnTop = mDrawSelectorOnTop;
 
         if (drawSelector && !drawSelectorOnTop) {
+            int saveCount2 = canvas.save();
+            canvas.translate(mMotionView.getLeft(), mMotionView.getTop());
             drawSelector(canvas);
+            canvas.restoreToCount(saveCount2);
         }
 
         super.dispatchDraw(canvas);
 
         if (drawSelector && drawSelectorOnTop) {
+            int saveCount2 = canvas.save();
+            canvas.translate(mMotionView.getLeft(), mMotionView.getTop());
             drawSelector(canvas);
+            canvas.restoreToCount(saveCount2);
         }
 
         if (clipToPadding) {
@@ -368,14 +375,6 @@ public class EasyRecyclerView extends RecyclerView {
      */
     public Drawable getSelector() {
         return mSelector;
-    }
-
-    private void cancelDrawingSelector() {
-        Rect rect = mSelectorRect;
-        rect.left = 0;
-        rect.top = 0;
-        rect.right = 0;
-        rect.bottom = 0;
     }
 
     void updateSelectorState() {
@@ -900,7 +899,6 @@ public class EasyRecyclerView extends RecyclerView {
                 setPressed(false);
             }
             updateSelectorState();
-            cancelDrawingSelector();
         }
     }
 
@@ -933,7 +931,7 @@ public class EasyRecyclerView extends RecyclerView {
                     if (d instanceof TransitionDrawable) {
                         ((TransitionDrawable) d).resetTransition();
                     }
-                    Hotspot.setHotspot(mSelector, x, y);
+                    setSelectorHotspot(motionView, x, y);
                 }
 
                 if (!mHasPerformedLongPress) {
@@ -970,9 +968,6 @@ public class EasyRecyclerView extends RecyclerView {
             }
 
             updateSelectorState();
-
-            // Release
-            mMotionView = null;
         }
     }
 
@@ -986,9 +981,6 @@ public class EasyRecyclerView extends RecyclerView {
             setPressed(false);
             removeTapCallback();
             removeLongPressCallback();
-
-            // Release motion view
-            mMotionView = null;
         }
     }
 
@@ -1297,7 +1289,7 @@ public class EasyRecyclerView extends RecyclerView {
                             ((TransitionDrawable) d).resetTransition();
                         }
                     }
-                    Hotspot.setHotspot(mSelector, x, y);
+                    setSelectorHotspot(v, x, y);
                 }
 
                 if (longClickable) {
@@ -1322,7 +1314,7 @@ public class EasyRecyclerView extends RecyclerView {
 
 
 
-    private class CheckForLongPress extends WindowRunnnable implements Runnable {
+    private class CheckForLongPress extends WindowRunnable implements Runnable {
         View v;
         int p;
 
@@ -1364,7 +1356,7 @@ public class EasyRecyclerView extends RecyclerView {
         }
     }
 
-    private class PerformClick extends WindowRunnnable implements Runnable {
+    private class PerformClick extends WindowRunnable implements Runnable {
         View v;
         int p;
 
@@ -1386,7 +1378,7 @@ public class EasyRecyclerView extends RecyclerView {
      * the original window as when the Runnable was created.
      *
      */
-    private class WindowRunnnable {
+    private class WindowRunnable {
         private int mOriginalAttachCount;
 
         public void rememberWindowAttachCount() {

@@ -75,7 +75,7 @@ public class FastScroller extends View {
     private ObjectAnimator mShowAnimator;
     private ObjectAnimator mHideAnimator;
 
-    private Runnable mHideRunnable = new Runnable() {
+    private final Runnable mHideRunnable = new Runnable() {
         @Override
         public void run() {
             mHideAnimator.start();
@@ -158,13 +158,13 @@ public class FastScroller extends View {
             return;
         }
 
-        int endOffest = height * offset / range;
+        int endOffset = height * offset / range;
         int endHeight = height * extent / range;
 
         endHeight = Math.max(endHeight, mMinHandlerHeight);
-        endOffest = Math.min(endOffest, height- endHeight);
+        endOffset = Math.min(endOffset, height- endHeight);
 
-        mHandlerOffset = endOffest + paddingTop;
+        mHandlerOffset = endOffset + paddingTop;
         mHandlerHeight = endHeight;
 
         if (show) {

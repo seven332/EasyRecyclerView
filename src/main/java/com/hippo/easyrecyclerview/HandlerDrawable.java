@@ -27,9 +27,8 @@ import android.graphics.drawable.Drawable;
 public class HandlerDrawable extends Drawable {
 
     private int mColor = Color.BLACK;
-    private Paint mPaint;
-
-    private RectF mTemp = new RectF();
+    private final Paint mPaint;
+    private final RectF mTemp = new RectF();
 
     public HandlerDrawable() {
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
