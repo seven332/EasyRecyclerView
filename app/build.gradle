@@ -2,11 +2,11 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 24
-    buildToolsVersion "24.0.1"
+    buildToolsVersion "24.0.2"
 
     defaultConfig {
         applicationId "com.hippo.easyrecyclerview.example"
-        minSdkVersion 11
+        minSdkVersion 14
         targetSdkVersion 24
         versionCode 2
         versionName "0.1.1"
@@ -23,6 +23,6 @@ android {
 dependencies {
     compile project(':library')
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.android.support:appcompat-v7:24.1.1'
+    compile 'com.github.seven332:ripple:0.1.2'
     testCompile 'junit:junit:4.12'
 }
