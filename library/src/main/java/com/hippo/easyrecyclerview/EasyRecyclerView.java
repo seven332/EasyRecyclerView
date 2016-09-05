@@ -26,6 +26,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v4.util.LongSparseArray;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.SparseBooleanArray;
@@ -290,7 +291,11 @@ public class EasyRecyclerView extends RecyclerView {
                     scrollY + getBottom() - getTop() - getPaddingBottom());
         }
 
-        // TODO disable selector drawable state change when need not to draw selector
+        // Check mMotionView
+        if (mMotionView != null && !ViewCompat.isAttachedToWindow(mMotionView)) {
+            mMotionView = null;
+        }
+
         boolean drawSelector = mMotionView != null &&
                 mSelectorPosition >= 0 && mSelectorPosition < mAdapter.getItemCount() &&
                 (mOnDrawSelectorListener == null || mOnDrawSelectorListener.beforeDrawSelector(mSelectorPosition));
