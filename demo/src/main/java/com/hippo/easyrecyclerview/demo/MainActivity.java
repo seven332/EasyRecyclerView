@@ -20,6 +20,10 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.ActionMode;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -34,21 +38,86 @@ public class MainActivity extends Activity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
 
-    EasyRecyclerView recyclerView = (EasyRecyclerView) findViewById(R.id.recycler_view);
+    final EasyRecyclerView recyclerView = (EasyRecyclerView) findViewById(R.id.recycler_view);
     recyclerView.setAdapter(new SimpleAdapter());
     recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
     recyclerView.setOnItemClickListener(new EasyRecyclerView.OnItemClickListener() {
       @Override
       public void onItemClick(EasyRecyclerView parent, RecyclerView.ViewHolder holder) {
-        Toast.makeText(MainActivity.this, "click " + holder.toString(), Toast.LENGTH_SHORT).show();
+        if (!recyclerView.isInChoiceMode()) {
+          recyclerView.intoChoiceMode();
+        }
+        recyclerView.toggleItemChecked(holder.getAdapterPosition());
+        if (recyclerView.getCheckedItemCount() == 0) {
+          recyclerView.outOfChoiceMode();
+        }
       }
     });
+
     recyclerView.setOnItemLongClickListener(new EasyRecyclerView.OnItemLongClickListener() {
       @Override
       public boolean onItemLongClick(EasyRecyclerView parent, RecyclerView.ViewHolder holder) {
         Toast.makeText(MainActivity.this, "long click " + holder.toString(), Toast.LENGTH_SHORT).show();
         return true;
+      }
+    });
+
+    recyclerView.setChoiceModeListener(new EasyRecyclerView.ChoiceModeListener() {
+
+      private ActionMode actionMode;
+
+      @Override
+      public void onIntoChoiceMode(EasyRecyclerView view) {
+        startActionMode(new ActionMode.Callback() {
+          @Override
+          public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            menu.add("CheckAll");
+            return true;
+          }
+
+          @Override
+          public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false;
+          }
+
+          @Override
+          public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            if ("CheckAll".equals(item.getTitle())) {
+              recyclerView.checkAll();
+              return true;
+            } else {
+              return false;
+            }
+          }
+
+          @Override
+          public void onDestroyActionMode(ActionMode mode) {
+            actionMode = null;
+            if (recyclerView.isInChoiceMode()) {
+              recyclerView.outOfChoiceMode();
+            }
+          }
+        });
+      }
+
+      @Override
+      public void onOutOfChoiceMode(EasyRecyclerView view) {
+        Toast.makeText(MainActivity.this, "onOutOfChoiceMode", Toast.LENGTH_SHORT).show();
+        if (actionMode != null) {
+          actionMode.finish();
+        }
+      }
+
+      @Override
+      public void onItemCheckedStateChanged(EasyRecyclerView view, int position, long id, boolean checked) {
+        Toast.makeText(MainActivity.this,
+            "onItemCheckedStateChanged position=" + position + " id=" + id + " checked=" + checked, Toast.LENGTH_SHORT).show();
+      }
+
+      @Override
+      public void onItemsCheckedStateChanged(EasyRecyclerView view) {
+        Toast.makeText(MainActivity.this, "onItemsCheckedStateChanged", Toast.LENGTH_SHORT).show();
       }
     });
   }
@@ -82,7 +151,7 @@ public class MainActivity extends Activity {
 
     @Override
     public SimpleHolder onCreateViewHolder2(ViewGroup parent, int viewType) {
-      return new SimpleHolder(new TextView(parent.getContext()));
+      return new SimpleHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item, parent, false));
     }
 
     @Override
@@ -91,8 +160,13 @@ public class MainActivity extends Activity {
     }
 
     @Override
+    public long getItemId(int position) {
+      return position;
+    }
+
+    @Override
     public int getItemCount() {
-      return 10000;
+      return 100;
     }
   }
 }
