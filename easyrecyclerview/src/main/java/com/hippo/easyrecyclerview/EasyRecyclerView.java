@@ -23,6 +23,9 @@ package com.hippo.easyrecyclerview;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
@@ -35,6 +38,32 @@ import android.widget.Checkable;
 /**
  * A {@code EasyRecyclerView} is a {@link RecyclerView}
  * with some features of {@link android.widget.ListView}.
+ * <p>
+ * Features:
+ * <ul>
+ * <li>{@code setOnItemClickListener}</li>
+ * <li>{@code setOnItemLongClickListener}</li>
+ * <li>{@code choice mode}</li>
+ * </ul>
+ * <p>
+ * {@link #setOnItemClickListener(OnItemClickListener)}
+ * and {@link #setOnItemLongClickListener(OnItemLongClickListener)}
+ * are implemented via {@link View#setOnClickListener(OnClickListener)}
+ * and {@link View#setOnLongClickListener(OnLongClickListener)}
+ * to child view.
+ * <p>
+ * No action mode reaction for choice mode.
+ * Single or multiple choices, implements it by your own.
+ * <p>
+ * Choice mode state is saved. When restores state,
+ * {@link ChoiceModeListener#onIntoChoiceMode(EasyRecyclerView)}
+ * and {@link ChoiceModeListener#onItemCheckedStateChanged(EasyRecyclerView, int, long, boolean)}
+ * are called, if the view was in choice mode before.
+ * <p>
+ * You can call {@code Adapter.notifyXXX()} during choice mode.
+ * {@link ChoiceModeListener#onItemsCheckedStateChanged(EasyRecyclerView)}
+ * is called if any position of checked item is changed.
+ * It's better to call {@link #getCheckedItemPositions()} to update the choice state you saved in it.
  */
 public class EasyRecyclerView extends RecyclerView {
 
@@ -346,6 +375,113 @@ public class EasyRecyclerView extends RecyclerView {
       return handled;
     } else {
       return false;
+    }
+  }
+
+  /**
+   * This saved state class is a Parcelable and should not extend
+   * {@link android.view.View.BaseSavedState} nor {@link android.view.AbsSavedState}
+   * because its super class AbsSavedState's constructor
+   * {@link android.view.AbsSavedState#AbsSavedState(Parcel)} currently passes null
+   * as a class loader to read its superstate from Parcelable.
+   * This causes {@link android.os.BadParcelableException} when restoring saved states.
+   * <p/>
+   * The super class "RecyclerView" is a part of the support library,
+   * and restoring its saved state requires the class loader that loaded the RecyclerView.
+   * It seems that the class loader is not required when restoring from RecyclerView itself,
+   * but it is required when restoring from RecyclerView's subclasses.
+   */
+  static class SavedState implements Parcelable {
+
+    public static final SavedState EMPTY_STATE = new SavedState() {};
+
+    boolean inChoiceMode;
+    ChoiceState choiceState;
+
+    // This keeps the parent(RecyclerView)'s state
+    Parcelable mSuperState;
+
+    SavedState() {
+      mSuperState = null;
+    }
+
+    /**
+     * Constructor called from {@link #onSaveInstanceState()}
+     */
+    SavedState(Parcelable superState) {
+      mSuperState = superState != EMPTY_STATE ? superState : null;
+    }
+
+    /**
+     * Constructor called from {@link #CREATOR}
+     */
+    private SavedState(Parcel in) {
+      // Parcel 'in' has its parent(RecyclerView)'s saved state.
+      // To restore it, class loader that loaded RecyclerView is required.
+      Parcelable superState = in.readParcelable(RecyclerView.class.getClassLoader());
+      mSuperState = superState != null ? superState : EMPTY_STATE;
+      inChoiceMode = (in.readInt() != 0);
+      choiceState = ChoiceState.readFromParcel(in);
+    }
+
+    @Override
+    public int describeContents() {
+      return 0;
+    }
+
+    @Override
+    public void writeToParcel(@NonNull Parcel out, int flags) {
+      out.writeParcelable(mSuperState, flags);
+      out.writeInt(inChoiceMode ? 1 : 0);
+      ChoiceState.writeToParcel(choiceState, out);
+    }
+
+    public Parcelable getSuperState() {
+      return mSuperState;
+    }
+
+    public static final Parcelable.Creator<SavedState> CREATOR
+        = new Parcelable.Creator<SavedState>() {
+      @Override
+      public SavedState createFromParcel(Parcel in) {
+        return new SavedState(in);
+      }
+
+      @Override
+      public SavedState[] newArray(int size) {
+        return new SavedState[size];
+      }
+    };
+  }
+
+  @Override
+  public Parcelable onSaveInstanceState() {
+    final SavedState ss = new SavedState(super.onSaveInstanceState());
+
+    ss.inChoiceMode = inChoiceMode;
+    ss.choiceState = choiceState;
+
+    return ss;
+  }
+
+  @Override
+  public void onRestoreInstanceState(Parcelable state) {
+    SavedState ss = (SavedState) state;
+    super.onRestoreInstanceState(ss.getSuperState());
+
+    if (ss.inChoiceMode) {
+      intoChoiceMode();
+
+      int[] positions = ss.choiceState.getCheckedItemPositions();
+      for (int position: positions) {
+        choiceState.setChecked(position, true);
+        if (choiceModeListener != null) {
+          long id = adapter.getItemId(position);
+          choiceModeListener.onItemCheckedStateChanged(this, position, id, true);
+        }
+      }
+
+      updateOnScreenViews();
     }
   }
 

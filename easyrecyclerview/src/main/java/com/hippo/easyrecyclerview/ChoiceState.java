@@ -20,6 +20,7 @@ package com.hippo.easyrecyclerview;
  * Created by Hippo on 1/28/2017.
  */
 
+import android.os.Parcel;
 import android.support.v7.widget.RecyclerView;
 import java.util.Arrays;
 
@@ -27,6 +28,14 @@ class ChoiceState {
 
   /** Checked position set **/
   private OrderedIntArray array = new OrderedIntArray();
+
+  public ChoiceState() {
+    this(new OrderedIntArray());
+  }
+
+  public ChoiceState(OrderedIntArray array) {
+    this.array = array;
+  }
 
   /**
    * Returns {@code true} if the view in the position is checked.
@@ -226,6 +235,39 @@ class ChoiceState {
     }
 
     return result;
+  }
+
+  /**
+   * Save {@code ChoiceState} to {@code Parcel}.
+   */
+  public static void writeToParcel(ChoiceState state, Parcel out) {
+    if (state == null) {
+      out.writeInt(-1);
+    } else {
+      int size = state.array.size;
+      int[] array = state.array.array;
+      out.writeInt(state.array.size);
+      for (int i = 0; i < size; ++i) {
+        out.writeInt(array[i]);
+      }
+    }
+  }
+
+  /**
+   * Read {@code ChoiceState} from {@code Parcel}.
+   */
+  public static ChoiceState readFromParcel(Parcel in) {
+    int size = in.readInt();
+    if (size == -1) {
+      return null;
+    } else {
+      OrderedIntArray array = new OrderedIntArray(size);
+      int[] a = array.array;
+      for (int i = 0; i < size; ++i) {
+        a[i] = in.readInt();
+      }
+      return new ChoiceState(array);
+    }
   }
 
   private static class OrderedIntArray {
