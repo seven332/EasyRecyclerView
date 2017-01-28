@@ -20,6 +20,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -27,11 +28,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 import com.hippo.easyrecyclerview.EasyAdapter;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
 
 public class MainActivity extends Activity {
+
+  private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +60,7 @@ public class MainActivity extends Activity {
     recyclerView.setOnItemLongClickListener(new EasyRecyclerView.OnItemLongClickListener() {
       @Override
       public boolean onItemLongClick(EasyRecyclerView parent, RecyclerView.ViewHolder holder) {
-        Toast.makeText(MainActivity.this, "long click " + holder.toString(), Toast.LENGTH_SHORT).show();
+        Log.d(LOG_TAG, "long click " + holder.toString());
         return true;
       }
     });
@@ -69,10 +71,13 @@ public class MainActivity extends Activity {
 
       @Override
       public void onIntoChoiceMode(EasyRecyclerView view) {
+        Log.d(LOG_TAG, "onIntoChoiceMode");
         startActionMode(new ActionMode.Callback() {
           @Override
           public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            Log.d(LOG_TAG, "onCreateActionMode");
             menu.add("CheckAll");
+            actionMode = mode;
             return true;
           }
 
@@ -93,6 +98,7 @@ public class MainActivity extends Activity {
 
           @Override
           public void onDestroyActionMode(ActionMode mode) {
+            Log.d(LOG_TAG, "onDestroyActionMode");
             actionMode = null;
             if (recyclerView.isInChoiceMode()) {
               recyclerView.outOfChoiceMode();
@@ -103,7 +109,7 @@ public class MainActivity extends Activity {
 
       @Override
       public void onOutOfChoiceMode(EasyRecyclerView view) {
-        Toast.makeText(MainActivity.this, "onOutOfChoiceMode", Toast.LENGTH_SHORT).show();
+        Log.d(LOG_TAG, "onOutOfChoiceMode");
         if (actionMode != null) {
           actionMode.finish();
         }
@@ -111,13 +117,12 @@ public class MainActivity extends Activity {
 
       @Override
       public void onItemCheckedStateChanged(EasyRecyclerView view, int position, long id, boolean checked) {
-        Toast.makeText(MainActivity.this,
-            "onItemCheckedStateChanged position=" + position + " id=" + id + " checked=" + checked, Toast.LENGTH_SHORT).show();
+        Log.d(LOG_TAG, "onItemCheckedStateChanged position=" + position + " id=" + id + " checked=" + checked);
       }
 
       @Override
       public void onItemsCheckedStateChanged(EasyRecyclerView view) {
-        Toast.makeText(MainActivity.this, "onItemsCheckedStateChanged", Toast.LENGTH_SHORT).show();
+        Log.d(LOG_TAG, "onItemsCheckedStateChanged");
       }
     });
   }
@@ -129,21 +134,6 @@ public class MainActivity extends Activity {
     public SimpleHolder(View itemView) {
       super(itemView);
       text = (TextView) itemView;
-
-      itemView.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-          Toast.makeText(v.getContext(), "click", Toast.LENGTH_SHORT).show();
-        }
-      });
-
-      itemView.setOnLongClickListener(new View.OnLongClickListener() {
-        @Override
-        public boolean onLongClick(View v) {
-          Toast.makeText(v.getContext(), "long click", Toast.LENGTH_SHORT).show();
-          return true;
-        }
-      });
     }
   }
 
