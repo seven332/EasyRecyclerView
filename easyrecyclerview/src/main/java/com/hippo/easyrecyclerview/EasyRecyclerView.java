@@ -359,6 +359,39 @@ public class EasyRecyclerView extends RecyclerView {
     }
   }
 
+  /**
+   * Calls this {@code EasyRecyclerView}'s {@code OnItemClickListener}, if it is defined.
+   *
+   * @return {@code true} if the view is on screen and
+   *          {@code OnItemClickListener} consumed the event,
+   *          {@code false} otherwise
+   */
+  public boolean performItemClick(int position) {
+    ViewHolder holder = findViewHolderForAdapterPosition(position);
+    if (holder != null) {
+      performItemClick(holder);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   * Calls this {@code EasyRecyclerView}'s {@code OnItemLongClickListener}, if it is defined.
+   *
+   * @return {@code true} if the view is on screen and
+   *          {@code OnItemLongClickListener} consumed the event,
+   *          {@code false} otherwise
+   */
+  public boolean performItemLongClick(int position) {
+    ViewHolder holder = findViewHolderForAdapterPosition(position);
+    if (holder != null) {
+      return performItemLongClick(holder);
+    } else {
+      return false;
+    }
+  }
+
   void performItemClick(ViewHolder holder) {
     if (onItemClickListener != null) {
       onItemClickListener.onItemClick(this, holder);
