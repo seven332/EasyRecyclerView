@@ -369,8 +369,7 @@ public class EasyRecyclerView extends RecyclerView {
   public boolean performItemClick(int position) {
     ViewHolder holder = findViewHolderForAdapterPosition(position);
     if (holder != null) {
-      performItemClick(holder);
-      return true;
+      return performItemClick(holder);
     } else {
       return false;
     }
@@ -392,10 +391,13 @@ public class EasyRecyclerView extends RecyclerView {
     }
   }
 
-  void performItemClick(ViewHolder holder) {
+  boolean performItemClick(ViewHolder holder) {
     if (onItemClickListener != null) {
       onItemClickListener.onItemClick(this, holder);
       playSoundEffect(SoundEffectConstants.CLICK);
+      return true;
+    } else {
+      return false;
     }
   }
 
