@@ -81,6 +81,28 @@ public class EasyRecyclerView extends RecyclerView {
   private OnItemClickListener onItemClickListener;
   private OnItemLongClickListener onItemLongClickListener;
 
+  View.OnClickListener itemOnClickListener = new View.OnClickListener() {
+    @Override
+    public void onClick(View v) {
+      RecyclerView.ViewHolder holder = getChildViewHolder(v);
+      if (holder != null) {
+        performItemClick(holder);
+      }
+    }
+  };
+
+  View.OnLongClickListener itemOnLongClickListener = new View.OnLongClickListener() {
+    @Override
+    public boolean onLongClick(View v) {
+      RecyclerView.ViewHolder holder = getChildViewHolder(v);
+      if (holder != null) {
+        return performItemLongClick(holder);
+      } else {
+        return false;
+      }
+    }
+  };
+
   public EasyRecyclerView(Context context) {
     super(context);
   }

@@ -33,8 +33,7 @@ import android.view.ViewGroup;
  * One {@code EasyAdapter} for one {@code EasyRecyclerView} only.
  */
 public abstract class EasyAdapter<VH extends RecyclerView.ViewHolder>
-    extends RecyclerView.Adapter<VH>
-    implements View.OnClickListener, View.OnLongClickListener {
+    extends RecyclerView.Adapter<VH> {
 
   private EasyRecyclerView recyclerView;
 
@@ -59,10 +58,13 @@ public abstract class EasyAdapter<VH extends RecyclerView.ViewHolder>
 
   @Override
   public final VH onCreateViewHolder(ViewGroup parent, int viewType) {
+    if (recyclerView == null) {
+      throw new IllegalStateException("The EasyAdapter is not attached a EasyRecyclerView");
+    }
     VH viewHolder = onCreateViewHolder2(parent, viewType);
     View view = viewHolder.itemView;
-    view.setOnClickListener(this);
-    view.setOnLongClickListener(this);
+    view.setOnClickListener(recyclerView.itemOnClickListener);
+    view.setOnLongClickListener(recyclerView.itemOnLongClickListener);
     // Let EasyRecyclerView handle SoundEffects and HapticFeedback
     view.setSoundEffectsEnabled(false);
     view.setHapticFeedbackEnabled(false);
@@ -73,22 +75,4 @@ public abstract class EasyAdapter<VH extends RecyclerView.ViewHolder>
    * The same as {@link #onCreateViewHolder(ViewGroup, int)}.
    */
   public abstract VH onCreateViewHolder2(ViewGroup parent, int viewType);
-
-  @Override
-  public void onClick(View v) {
-    RecyclerView.ViewHolder holder = recyclerView.getChildViewHolder(v);
-    if (holder != null) {
-      recyclerView.performItemClick(holder);
-    }
-  }
-
-  @Override
-  public boolean onLongClick(View v) {
-    RecyclerView.ViewHolder holder = recyclerView.getChildViewHolder(v);
-    if (holder != null) {
-      return recyclerView.performItemLongClick(holder);
-    } else {
-      return false;
-    }
-  }
 }
