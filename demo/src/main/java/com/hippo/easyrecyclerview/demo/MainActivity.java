@@ -17,6 +17,7 @@
 package com.hippo.easyrecyclerview.demo;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -30,6 +31,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import com.hippo.easyrecyclerview.EasyAdapter;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
+import com.hippo.recyclerview.addons.LinearDividerItemDecoration;
 
 public class MainActivity extends Activity {
 
@@ -125,6 +127,16 @@ public class MainActivity extends Activity {
         Log.d(LOG_TAG, "onItemsCheckedStateChanged");
       }
     });
+
+    LinearDividerItemDecoration divider = new LinearDividerItemDecoration(
+        LinearDividerItemDecoration.VERTICAL,
+        Color.BLACK,
+        (int) (8 * getResources().getDisplayMetrics().density)
+    );
+    divider.setPaddingStart((int) (8 * getResources().getDisplayMetrics().density));
+    divider.setPaddingEnd((int) (32 * getResources().getDisplayMetrics().density));
+    divider.setOverlap(false);
+    recyclerView.addItemDecoration(divider);
   }
 
   private static class SimpleHolder extends RecyclerView.ViewHolder {
