@@ -14,5 +14,7 @@
  * limitations under the License.
  */
 
-include ':demo', ':easyrecyclerview-rxjava'
 include ':easyrecyclerview'
+include ':easyrecyclerview-rxjava'
+include ':recyclerview-addons'
+include ':demo'
