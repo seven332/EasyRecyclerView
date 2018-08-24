@@ -46,7 +46,7 @@ public class HandlerDrawable extends Drawable {
         } else {
             mTemp.set(0, 0, width, width);
             canvas.drawArc(mTemp, -180, 180, true, mPaint);
-            mTemp.set(0, height - width, width, height);
+            mTemp.set(0, height - width - 1.0f, width, height);
             canvas.drawArc(mTemp, 0, 180, true, mPaint);
             float halfWidth = (float) width / 2.0f;
             canvas.drawRect(0, halfWidth, width, height - halfWidth, mPaint);
